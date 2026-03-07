@@ -83,6 +83,7 @@ export const labels = defineMessages({
     defaultMessage: 'Regenerate recovery codes',
   },
   copyCodes: { id: 'label.copy-codes', defaultMessage: 'Copy codes' },
+  copied: { id: 'label.copied', defaultMessage: 'Copied' },
   iSavedRecoveryCodes: {
     id: 'label.i-saved-recovery-codes',
     defaultMessage: 'I saved these codes',
@@ -529,10 +530,6 @@ export const messages = defineMessages({
     id: 'message.two-factor-recovery-warning',
     defaultMessage:
       'Save these recovery codes in a secure place. Each code can be used once if you lose access to your authenticator.',
-  },
-  twoFactorRecoveryCopied: {
-    id: 'message.two-factor-recovery-copied',
-    defaultMessage: 'Recovery codes copied to clipboard.',
   },
   twoFactorRecoveryCopyFailed: {
     id: 'message.two-factor-recovery-copy-failed',

@@ -7,6 +7,7 @@ import {
   FormButtons,
   FormField,
   FormSubmitButton,
+  IconLabel,
   Label,
   Modal,
   PasswordField,
@@ -16,8 +17,9 @@ import {
   useToast,
 } from '@umami/react-zen';
 import type { CSSProperties, ReactNode } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApi, useMessages, useMobile } from '@/components/hooks';
+import { Check, Copy } from '@/components/icons';
 import { removeClientTwoFactorTrustToken } from '@/lib/client';
 import type { ApiError } from '@/lib/types';
 
@@ -100,17 +102,43 @@ function TwoFactorDialog({ title, children }: { title: ReactNode; children: any 
 function RecoveryCodes({
   codes,
   copyLabel,
+  copiedLabel,
   onCopy,
 }: {
   codes: string[];
   copyLabel: string;
-  onCopy: () => void;
+  copiedLabel: string;
+  onCopy: () => Promise<boolean>;
 }) {
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [copied]);
+
+  const handleCopy = async () => {
+    const success = await onCopy();
+    if (success) {
+      setCopied(true);
+    }
+  };
+
   return (
     <Column gap="2">
       <Row justifyContent="flex-end">
-        <Button variant="quiet" onPress={onCopy} data-test="button-copy-recovery-codes">
-          {copyLabel}
+        <Button variant="outline" onPress={handleCopy} data-test="button-copy-recovery-codes">
+          <IconLabel
+            icon={copied ? <Check size={16} /> : <Copy size={16} />}
+            label={copied ? copiedLabel : copyLabel}
+          />
         </Button>
       </Row>
       <pre style={recoveryCodesStyle}>{codes.join('\n')}</pre>
@@ -129,11 +157,11 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
 
   const handleCopyRecoveryCodes = async () => {
     const success = await copyToClipboard(recoveryCodes.join('\n'));
-    toast(
-      formatMessage(
-        success ? messages.twoFactorRecoveryCopied : messages.twoFactorRecoveryCopyFailed,
-      ),
-    );
+    if (!success) {
+      toast(formatMessage(messages.twoFactorRecoveryCopyFailed));
+    }
+
+    return success;
   };
 
   const handlePassword = async ({ currentPassword }: Record<string, string>) => {
@@ -177,6 +205,7 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
         <RecoveryCodes
           codes={recoveryCodes}
           copyLabel={formatMessage(labels.copyCodes)}
+          copiedLabel={formatMessage(labels.copied)}
           onCopy={handleCopyRecoveryCodes}
         />
         <FormButtons>
@@ -307,11 +336,11 @@ function RecoveryCodesForm({ onClose }: any) {
 
   const handleCopyRecoveryCodes = async () => {
     const success = await copyToClipboard(recoveryCodes.join('\n'));
-    toast(
-      formatMessage(
-        success ? messages.twoFactorRecoveryCopied : messages.twoFactorRecoveryCopyFailed,
-      ),
-    );
+    if (!success) {
+      toast(formatMessage(messages.twoFactorRecoveryCopyFailed));
+    }
+
+    return success;
   };
 
   const handleRegenerate = async ({ currentPassword }: Record<string, string>) => {
@@ -335,6 +364,7 @@ function RecoveryCodesForm({ onClose }: any) {
         <RecoveryCodes
           codes={recoveryCodes}
           copyLabel={formatMessage(labels.copyCodes)}
+          copiedLabel={formatMessage(labels.copied)}
           onCopy={handleCopyRecoveryCodes}
         />
         <FormButtons>
