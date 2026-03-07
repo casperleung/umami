@@ -22,6 +22,10 @@ if (!process.env.SKIP_DB_CHECK && !process.env.DATABASE_TYPE) {
   checkMissing(['DATABASE_URL']);
 }
 
+if (!process.env.DISABLE_LOGIN) {
+  checkMissing(['APP_SECRET']);
+}
+
 if (process.env.CLOUD_URL) {
   checkMissing(['CLOUD_URL', 'CLICKHOUSE_URL', 'REDIS_URL']);
 }

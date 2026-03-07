@@ -13,7 +13,7 @@ if (process.env.SKIP_DB_CHECK) {
   process.exit(0);
 }
 
-const url = new URL(process.env.DATABASE_URL);
+const url = new URL(process.env.DIRECT_URL || process.env.DATABASE_URL);
 
 const adapter = new PrismaPg(
   { connectionString: url.toString() },
@@ -31,7 +31,7 @@ function error(msg) {
 }
 
 async function checkEnv() {
-  if (!process.env.DATABASE_URL) {
+  if (!process.env.DATABASE_URL && !process.env.DIRECT_URL) {
     throw new Error('DATABASE_URL is not defined.');
   } else {
     success('DATABASE_URL is defined.');
@@ -48,7 +48,7 @@ async function checkConnection() {
 
     success('Database connection successful.');
   } catch (e) {
-    throw new Error('Unable to connect to the database: ' + e.message);
+    throw new Error(`Unable to connect to the database: ${e.message}`);
   }
 }
 
@@ -67,7 +67,14 @@ async function checkDatabaseVersion() {
 
 async function applyMigration() {
   if (!process.env.SKIP_DB_MIGRATION) {
-    console.log(execSync('prisma migrate deploy').toString());
+    console.log(
+      execSync('prisma migrate deploy', {
+        env: {
+          ...process.env,
+          DATABASE_URL: process.env.DIRECT_URL || process.env.DATABASE_URL,
+        },
+      }).toString(),
+    );
 
     success('Database is up to date.');
   }

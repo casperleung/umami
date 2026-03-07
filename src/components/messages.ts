@@ -69,6 +69,25 @@ export const labels = defineMessages({
   currentPassword: { id: 'label.current-password', defaultMessage: 'Current password' },
   newPassword: { id: 'label.new-password', defaultMessage: 'New password' },
   confirmPassword: { id: 'label.confirm-password', defaultMessage: 'Confirm password' },
+  twoFactorAuthentication: {
+    id: 'label.two-factor-authentication',
+    defaultMessage: 'Two-factor authentication',
+  },
+  twoFactorCode: { id: 'label.two-factor-code', defaultMessage: 'Authentication code' },
+  recoveryCode: { id: 'label.recovery-code', defaultMessage: 'Recovery code' },
+  recoveryCodes: { id: 'label.recovery-codes', defaultMessage: 'Recovery codes' },
+  enableTwoFactor: { id: 'label.enable-two-factor', defaultMessage: 'Enable 2FA' },
+  disableTwoFactor: { id: 'label.disable-two-factor', defaultMessage: 'Disable 2FA' },
+  regenerateRecoveryCodes: {
+    id: 'label.regenerate-recovery-codes',
+    defaultMessage: 'Regenerate recovery codes',
+  },
+  trustDevice30Days: {
+    id: 'label.trust-device-30-days',
+    defaultMessage: 'Trust this device for 30 days',
+  },
+  verify: { id: 'label.verify', defaultMessage: 'Verify' },
+  manualKey: { id: 'label.manual-key', defaultMessage: 'Manual key' },
   timezone: { id: 'label.timezone', defaultMessage: 'Timezone' },
   defaultDateRange: { id: 'label.default-date-range', defaultMessage: 'Default date range' },
   language: { id: 'label.language', defaultMessage: 'Language' },
@@ -474,6 +493,42 @@ export const messages = defineMessages({
   incorrectUsernamePassword: {
     id: 'message.incorrect-username-password',
     defaultMessage: 'Incorrect username and/or password.',
+  },
+  twoFactorPrompt: {
+    id: 'message.two-factor-prompt',
+    defaultMessage: 'Enter your authenticator code or a recovery code.',
+  },
+  twoFactorSetupPrompt: {
+    id: 'message.two-factor-setup-prompt',
+    defaultMessage: 'Scan this QR code with your authenticator app or enter the manual key.',
+  },
+  twoFactorRecoveryWarning: {
+    id: 'message.two-factor-recovery-warning',
+    defaultMessage: 'Save these recovery codes now. Each code can only be used once.',
+  },
+  invalidTwoFactorCode: {
+    id: 'message.invalid-two-factor-code',
+    defaultMessage: 'Invalid authentication or recovery code.',
+  },
+  expiredTwoFactorChallenge: {
+    id: 'message.expired-two-factor-challenge',
+    defaultMessage: 'Your login verification has expired. Please login again.',
+  },
+  twoFactorRequired: {
+    id: 'message.two-factor-required',
+    defaultMessage: 'Two-factor authentication is required.',
+  },
+  invalidTwoFactorSetup: {
+    id: 'message.invalid-two-factor-setup',
+    defaultMessage: 'Two-factor setup is invalid or expired. Please start again.',
+  },
+  twoFactorAlreadyEnabled: {
+    id: 'message.two-factor-already-enabled',
+    defaultMessage: 'Two-factor authentication is already enabled.',
+  },
+  twoFactorNotEnabled: {
+    id: 'message.two-factor-not-enabled',
+    defaultMessage: 'Two-factor authentication is not enabled.',
   },
   noEventData: {
     id: 'message.no-event-data',

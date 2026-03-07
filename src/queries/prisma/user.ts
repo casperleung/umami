@@ -8,11 +8,12 @@ import UserFindManyArgs = Prisma.UserFindManyArgs;
 
 export interface GetUserOptions {
   includePassword?: boolean;
+  includeTwoFactor?: boolean;
   showDeleted?: boolean;
 }
 
 async function findUser(criteria: Prisma.UserFindUniqueArgs, options: GetUserOptions = {}) {
-  const { includePassword = false, showDeleted = false } = options;
+  const { includePassword = false, includeTwoFactor = false, showDeleted = false } = options;
 
   return prisma.client.user.findUnique({
     ...criteria,
@@ -25,6 +26,10 @@ async function findUser(criteria: Prisma.UserFindUniqueArgs, options: GetUserOpt
       username: true,
       password: includePassword,
       role: true,
+      twoFactorEnabled: true,
+      twoFactorSecret: includeTwoFactor,
+      twoFactorRecoveryCodes: includeTwoFactor,
+      twoFactorChallenge: includeTwoFactor,
       createdAt: true,
     },
   });
@@ -47,6 +52,13 @@ export async function getUserByUsername(username: string, options: GetUserOption
 
 export async function getUsers(criteria: UserFindManyArgs, filters: QueryFilters = {}) {
   const { search } = filters;
+  const omit = {
+    ...(criteria as any).omit,
+    password: true,
+    twoFactorSecret: true,
+    twoFactorRecoveryCodes: true,
+    twoFactorChallenge: true,
+  };
 
   const where: Prisma.UserWhereInput = {
     ...criteria.where,
@@ -58,6 +70,7 @@ export async function getUsers(criteria: UserFindManyArgs, filters: QueryFilters
     'user',
     {
       ...criteria,
+      omit,
       where,
     },
     {

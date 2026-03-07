@@ -1,18 +1,18 @@
+import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
-import { saveAuth } from '@/lib/auth';
+import { createAuthToken } from '@/lib/auth';
 import { ROLES } from '@/lib/constants';
-import { secret } from '@/lib/crypto';
-import { createSecureToken } from '@/lib/jwt';
 import { checkPassword } from '@/lib/password';
-import redis from '@/lib/redis';
 import { parseRequest } from '@/lib/request';
 import { json, unauthorized } from '@/lib/response';
-import { getAllUserTeams, getUserByUsername } from '@/queries/prisma';
+import { createTwoFactorChallengeToken, isTrustedDeviceTokenValid } from '@/lib/two-factor';
+import { getAllUserTeams, getUserByUsername, updateUser } from '@/queries/prisma';
 
 export async function POST(request: Request) {
   const schema = z.object({
     username: z.string(),
     password: z.string(),
+    trustedToken: z.string().optional(),
   });
 
   const { body, error } = await parseRequest(request, schema, { skipAuth: true });
@@ -21,28 +21,51 @@ export async function POST(request: Request) {
     return error();
   }
 
-  const { username, password } = body;
+  const { username, password, trustedToken } = body;
 
-  const user = await getUserByUsername(username, { includePassword: true });
+  const user = await getUserByUsername(username, { includePassword: true, includeTwoFactor: true });
 
   if (!user || !checkPassword(password, user.password)) {
     return unauthorized({ code: 'incorrect-username-password' });
   }
 
-  const { id, role, createdAt } = user;
+  const { id, role } = user;
 
-  let token: string;
+  const trustedDevice = trustedToken ? isTrustedDeviceTokenValid(trustedToken, user) : false;
 
-  if (redis.enabled) {
-    token = await saveAuth({ userId: id, role });
-  } else {
-    token = createSecureToken({ userId: user.id, role }, secret());
+  if (user.twoFactorEnabled && !trustedDevice) {
+    const challengeId = randomBytes(16).toString('hex');
+
+    await updateUser(id, {
+      twoFactorChallenge: challengeId,
+    });
+
+    return json({
+      twoFactorRequired: true,
+      challengeToken: createTwoFactorChallengeToken({
+        userId: id,
+        challengeId,
+      }),
+    });
   }
 
+  if (user.twoFactorChallenge) {
+    await updateUser(id, { twoFactorChallenge: null });
+  }
+
+  const token = await createAuthToken(id, role);
   const teams = await getAllUserTeams(id);
 
   return json({
     token,
-    user: { id, username, role, createdAt, isAdmin: role === ROLES.admin, teams },
+    user: {
+      id,
+      username,
+      role,
+      createdAt: user.createdAt,
+      isAdmin: role === ROLES.admin,
+      twoFactorEnabled: user.twoFactorEnabled,
+      teams,
+    },
   });
 }

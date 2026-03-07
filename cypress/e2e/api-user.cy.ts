@@ -39,7 +39,10 @@ describe('User API tests', () => {
       expect(response.status).to.eq(200);
       expect(response.body.data[0]).to.have.property('id');
       expect(response.body.data[0]).to.have.property('username');
-      expect(response.body.data[0]).to.have.property('password');
+      expect(response.body.data[0]).to.not.have.property('password');
+      expect(response.body.data[0]).to.not.have.property('twoFactorSecret');
+      expect(response.body.data[0]).to.not.have.property('twoFactorRecoveryCodes');
+      expect(response.body.data[0]).to.not.have.property('twoFactorChallenge');
       expect(response.body.data[0]).to.have.property('role');
     });
   });

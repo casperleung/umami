@@ -1,0 +1,54 @@
+name: Security Checks
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: "Optional URL for ZAP baseline scan (e.g. Vercel preview URL)"
+        required: false
+        type: string
+
+env:
+  DATABASE_URL: "postgresql://user:pass@localhost:5432/dummy"
+  APP_SECRET: "test-secret"
+  SKIP_DB_CHECK: 1
+
+jobs:
+  dependency-audit:
+    if: github.repository == 'umami-software/umami'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18.18
+          cache: "pnpm"
+      - run: npm install --global pnpm
+      - run: pnpm install
+      - run: pnpm audit --audit-level high
+
+  secret-scan:
+    if: github.repository == 'umami-software/umami'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  dast-baseline:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.target_url != ''
+    runs-on: ubuntu-latest
+    steps:
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: ${{ github.event.inputs.target_url }}

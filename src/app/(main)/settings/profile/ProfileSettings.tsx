@@ -2,9 +2,10 @@ import { Column, Label, Row } from '@umami/react-zen';
 import { useConfig, useLoginQuery, useMessages } from '@/components/hooks';
 import { ROLES } from '@/lib/constants';
 import { PasswordChangeButton } from './PasswordChangeButton';
+import { TwoFactorSettingsButton } from './TwoFactorSettingsButton';
 
 export function ProfileSettings() {
-  const { user } = useLoginQuery();
+  const { user, setUser } = useLoginQuery();
   const { formatMessage, labels } = useMessages();
   const { cloudMode } = useConfig();
 
@@ -41,8 +42,14 @@ export function ProfileSettings() {
       {!cloudMode && (
         <Column>
           <Label>{formatMessage(labels.password)}</Label>
-          <Row>
-            <PasswordChangeButton />
+          <PasswordChangeButton />
+        </Column>
+      )}
+      {!cloudMode && (
+        <Column>
+          <Label>{formatMessage(labels.twoFactorAuthentication)}</Label>
+          <Row wrap="wrap" gap="2">
+            <TwoFactorSettingsButton user={user} setUser={setUser} />
           </Row>
         </Column>
       )}

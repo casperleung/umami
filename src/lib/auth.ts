@@ -66,6 +66,14 @@ export async function saveAuth(data: any, expire = 0) {
   return createSecureToken({ authKey }, secret());
 }
 
+export async function createAuthToken(userId: string, role?: string) {
+  if (redis.enabled) {
+    return saveAuth({ userId, role });
+  }
+
+  return createSecureToken({ userId, role }, secret());
+}
+
 export async function hasPermission(role: string, permission: string | string[]) {
   return ensureArray(permission).some(e => ROLE_PERMISSIONS[role]?.includes(e));
 }

@@ -44,6 +44,7 @@ Create an `.env` file with the following:
 
 ```bash
 DATABASE_URL=connection-url
+APP_SECRET=replace-with-a-long-random-string
 ```
 
 The connection URL format:
@@ -51,6 +52,9 @@ The connection URL format:
 ```bash
 postgresql://username:mypassword@localhost:5432/mydb
 ```
+
+For serverless deployments (for example Vercel + Supabase), use a pooled connection string for
+`DATABASE_URL` and set `DIRECT_URL` to the direct Postgres connection for running Prisma migrations.
 
 ### Build the Application
 

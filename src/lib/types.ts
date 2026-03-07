@@ -17,6 +17,7 @@ export interface Auth {
     username: string;
     role: string;
     isAdmin: boolean;
+    twoFactorEnabled?: boolean;
   };
   shareToken?: {
     websiteId: string;
