@@ -82,6 +82,11 @@ export const labels = defineMessages({
     id: 'label.regenerate-recovery-codes',
     defaultMessage: 'Regenerate recovery codes',
   },
+  copyCodes: { id: 'label.copy-codes', defaultMessage: 'Copy codes' },
+  iSavedRecoveryCodes: {
+    id: 'label.i-saved-recovery-codes',
+    defaultMessage: 'I saved these codes',
+  },
   trustDevice30Days: {
     id: 'label.trust-device-30-days',
     defaultMessage: 'Trust this device for 30 days',
@@ -496,15 +501,42 @@ export const messages = defineMessages({
   },
   twoFactorPrompt: {
     id: 'message.two-factor-prompt',
-    defaultMessage: 'Enter your authenticator code or a recovery code.',
+    defaultMessage: 'Enter the code from your authenticator app, or use a recovery code.',
+  },
+  twoFactorSetupIntro: {
+    id: 'message.two-factor-setup-intro',
+    defaultMessage:
+      'Two-factor authentication adds an extra verification step to keep your account secure.',
+  },
+  twoFactorSetupStepScan: {
+    id: 'message.two-factor-setup-step-scan',
+    defaultMessage: 'Step 1 of 2: Add your authenticator app.',
+  },
+  twoFactorSetupStepVerify: {
+    id: 'message.two-factor-setup-step-verify',
+    defaultMessage: 'Step 2 of 2: Enter the 6-digit code from your authenticator app.',
+  },
+  twoFactorSetupStepRecovery: {
+    id: 'message.two-factor-setup-step-recovery',
+    defaultMessage: 'Final step: Save your recovery codes before you continue.',
   },
   twoFactorSetupPrompt: {
     id: 'message.two-factor-setup-prompt',
-    defaultMessage: 'Scan this QR code with your authenticator app or enter the manual key.',
+    defaultMessage:
+      'Open your authenticator app and scan this QR code. If scanning is unavailable, enter the setup key manually.',
   },
   twoFactorRecoveryWarning: {
     id: 'message.two-factor-recovery-warning',
-    defaultMessage: 'Save these recovery codes now. Each code can only be used once.',
+    defaultMessage:
+      'Save these recovery codes in a secure place. Each code can be used once if you lose access to your authenticator.',
+  },
+  twoFactorRecoveryCopied: {
+    id: 'message.two-factor-recovery-copied',
+    defaultMessage: 'Recovery codes copied to clipboard.',
+  },
+  twoFactorRecoveryCopyFailed: {
+    id: 'message.two-factor-recovery-copy-failed',
+    defaultMessage: 'Could not copy recovery codes. Please copy them manually.',
   },
   invalidTwoFactorCode: {
     id: 'message.invalid-two-factor-code',

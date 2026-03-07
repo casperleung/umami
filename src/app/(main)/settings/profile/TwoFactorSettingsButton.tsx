@@ -26,6 +26,19 @@ interface TwoFactorSettingsButtonProps {
   setUser: (user: any) => void;
 }
 
+async function copyToClipboard(value: string) {
+  if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) {
+    return false;
+  }
+
+  try {
+    await navigator.clipboard.writeText(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 const qrCodeWrapperStyle: CSSProperties = {
   alignItems: 'center',
   background: 'var(--zen-colors-base2)',
@@ -84,9 +97,22 @@ function TwoFactorDialog({ title, children }: { title: ReactNode; children: any 
   );
 }
 
-function RecoveryCodes({ codes }: { codes: string[] }) {
+function RecoveryCodes({
+  codes,
+  copyLabel,
+  onCopy,
+}: {
+  codes: string[];
+  copyLabel: string;
+  onCopy: () => void;
+}) {
   return (
     <Column gap="2">
+      <Row justifyContent="flex-end">
+        <Button variant="quiet" onPress={onCopy} data-test="button-copy-recovery-codes">
+          {copyLabel}
+        </Button>
+      </Row>
       <pre style={recoveryCodesStyle}>{codes.join('\n')}</pre>
     </Column>
   );
@@ -100,6 +126,15 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
   const [error, setError] = useState<ApiError>(null);
   const [isPending, setIsPending] = useState(false);
+
+  const handleCopyRecoveryCodes = async () => {
+    const success = await copyToClipboard(recoveryCodes.join('\n'));
+    toast(
+      formatMessage(
+        success ? messages.twoFactorRecoveryCopied : messages.twoFactorRecoveryCopyFailed,
+      ),
+    );
+  };
 
   const handlePassword = async ({ currentPassword }: Record<string, string>) => {
     setIsPending(true);
@@ -137,8 +172,13 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
   if (recoveryCodes.length) {
     return (
       <Column gap="4">
+        <Label>{formatMessage(messages.twoFactorSetupStepRecovery)}</Label>
         <Text color="muted">{formatMessage(messages.twoFactorRecoveryWarning)}</Text>
-        <RecoveryCodes codes={recoveryCodes} />
+        <RecoveryCodes
+          codes={recoveryCodes}
+          copyLabel={formatMessage(labels.copyCodes)}
+          onCopy={handleCopyRecoveryCodes}
+        />
         <FormButtons>
           <Button
             variant="primary"
@@ -147,7 +187,7 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
               onClose();
             }}
           >
-            {formatMessage(labels.ok)}
+            {formatMessage(labels.iSavedRecoveryCodes)}
           </Button>
         </FormButtons>
       </Column>
@@ -158,6 +198,7 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
     return (
       <Form onSubmit={handleVerify} error={getErrorMessage(error)}>
         <Column gap="4">
+          <Label>{formatMessage(messages.twoFactorSetupStepScan)}</Label>
           <Text color="muted">{formatMessage(messages.twoFactorSetupPrompt)}</Text>
           {setup.qrCodeDataUrl && (
             <div style={qrCodeWrapperStyle}>
@@ -168,6 +209,7 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
             <Label>{formatMessage(labels.manualKey)}</Label>
             <TextField value={setup.manualCode} isReadOnly allowCopy autoComplete="off" />
           </Column>
+          <Label>{formatMessage(messages.twoFactorSetupStepVerify)}</Label>
           <FormField
             label={formatMessage(labels.twoFactorCode)}
             name="code"
@@ -190,6 +232,7 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
 
   return (
     <Form onSubmit={handlePassword} error={getErrorMessage(error)}>
+      <Text color="muted">{formatMessage(messages.twoFactorSetupIntro)}</Text>
       <FormField
         label={formatMessage(labels.currentPassword)}
         name="currentPassword"
@@ -257,9 +300,19 @@ function DisableTwoFactorForm({ user, setUser, onClose }: any) {
 function RecoveryCodesForm({ onClose }: any) {
   const { post } = useApi();
   const { formatMessage, labels, messages, getErrorMessage } = useMessages();
+  const { toast } = useToast();
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
   const [error, setError] = useState<ApiError>(null);
   const [isPending, setIsPending] = useState(false);
+
+  const handleCopyRecoveryCodes = async () => {
+    const success = await copyToClipboard(recoveryCodes.join('\n'));
+    toast(
+      formatMessage(
+        success ? messages.twoFactorRecoveryCopied : messages.twoFactorRecoveryCopyFailed,
+      ),
+    );
+  };
 
   const handleRegenerate = async ({ currentPassword }: Record<string, string>) => {
     setIsPending(true);
@@ -279,7 +332,11 @@ function RecoveryCodesForm({ onClose }: any) {
     return (
       <Column gap="4">
         <Text color="muted">{formatMessage(messages.twoFactorRecoveryWarning)}</Text>
-        <RecoveryCodes codes={recoveryCodes} />
+        <RecoveryCodes
+          codes={recoveryCodes}
+          copyLabel={formatMessage(labels.copyCodes)}
+          onCopy={handleCopyRecoveryCodes}
+        />
         <FormButtons>
           <Button variant="primary" onPress={onClose}>
             {formatMessage(labels.ok)}
