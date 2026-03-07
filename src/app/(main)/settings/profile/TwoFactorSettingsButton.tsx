@@ -49,12 +49,13 @@ const qrCodeWrapperStyle: CSSProperties = {
   display: 'flex',
   justifyContent: 'center',
   padding: 12,
+  width: '100%',
 };
 
 const qrCodeStyle: CSSProperties = {
   height: 'auto',
   maxWidth: '100%',
-  width: 280,
+  width: '100%',
 };
 
 const recoveryCodesStyle: CSSProperties = {
@@ -72,14 +73,18 @@ const recoveryCodesStyle: CSSProperties = {
   width: '100%',
 };
 
+const fullWidthStyle: CSSProperties = {
+  width: '100%',
+};
+
 function TwoFactorDialog({ title, children }: { title: ReactNode; children: any }) {
-  const { isMobile } = useMobile();
-  const style: CSSProperties = isMobile
+  const { isPhone } = useMobile();
+  const style: CSSProperties = isPhone
     ? {
         height: '100%',
         maxHeight: '100%',
         overflowY: 'auto',
-        padding: 24,
+        padding: 20,
         width: '100%',
       }
     : {
@@ -91,12 +96,22 @@ function TwoFactorDialog({ title, children }: { title: ReactNode; children: any 
       };
 
   return (
-    <Modal placement={isMobile ? 'fullscreen' : 'center'}>
-      <Dialog variant={isMobile ? 'sheet' : undefined} title={title} style={style}>
+    <Modal placement={isPhone ? 'fullscreen' : 'center'}>
+      <Dialog variant={isPhone ? 'sheet' : undefined} title={title} style={style}>
         {children}
       </Dialog>
     </Modal>
   );
+}
+
+function ResponsiveFormButtons({ children }: { children: ReactNode }) {
+  const { isPhone } = useMobile();
+
+  if (isPhone) {
+    return <Column gap="2">{children}</Column>;
+  }
+
+  return <FormButtons>{children}</FormButtons>;
 }
 
 function RecoveryCodes({
@@ -110,7 +125,9 @@ function RecoveryCodes({
   copiedLabel: string;
   onCopy: () => Promise<boolean>;
 }) {
+  const { isPhone } = useMobile();
   const [copied, setCopied] = useState(false);
+  const actionStyle = isPhone ? fullWidthStyle : undefined;
 
   useEffect(() => {
     if (!copied) {
@@ -133,8 +150,13 @@ function RecoveryCodes({
 
   return (
     <Column gap="2">
-      <Row justifyContent="flex-end">
-        <Button variant="outline" onPress={handleCopy} data-test="button-copy-recovery-codes">
+      <Row justifyContent="flex-end" style={actionStyle}>
+        <Button
+          variant="outline"
+          onPress={handleCopy}
+          data-test="button-copy-recovery-codes"
+          style={actionStyle}
+        >
           <IconLabel
             icon={copied ? <Check size={16} /> : <Copy size={16} />}
             label={copied ? copiedLabel : copyLabel}
@@ -149,11 +171,13 @@ function RecoveryCodes({
 function EnableTwoFactorForm({ user, setUser, onClose }: any) {
   const { post } = useApi();
   const { formatMessage, labels, messages, getErrorMessage } = useMessages();
+  const { isPhone } = useMobile();
   const { toast } = useToast();
   const [setup, setSetup] = useState<any>(null);
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
   const [error, setError] = useState<ApiError>(null);
   const [isPending, setIsPending] = useState(false);
+  const actionButtonStyle = isPhone ? fullWidthStyle : undefined;
 
   const handleCopyRecoveryCodes = async () => {
     const success = await copyToClipboard(recoveryCodes.join('\n'));
@@ -208,9 +232,10 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
           copiedLabel={formatMessage(labels.copied)}
           onCopy={handleCopyRecoveryCodes}
         />
-        <FormButtons>
+        <ResponsiveFormButtons>
           <Button
             variant="primary"
+            style={actionButtonStyle}
             onPress={() => {
               setUser({ ...user, twoFactorEnabled: true });
               onClose();
@@ -218,7 +243,7 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
           >
             {formatMessage(labels.iSavedRecoveryCodes)}
           </Button>
-        </FormButtons>
+        </ResponsiveFormButtons>
       </Column>
     );
   }
@@ -246,14 +271,14 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
           >
             <TextField autoComplete="one-time-code" inputMode="numeric" placeholder="123456" />
           </FormField>
-          <FormButtons>
-            <Button variant="quiet" onPress={() => setSetup(null)}>
+          <ResponsiveFormButtons>
+            <Button variant="quiet" style={actionButtonStyle} onPress={() => setSetup(null)}>
               {formatMessage(labels.back)}
             </Button>
-            <FormSubmitButton isDisabled={isPending} variant="primary">
+            <FormSubmitButton isDisabled={isPending} variant="primary" style={actionButtonStyle}>
               {formatMessage(labels.verify)}
             </FormSubmitButton>
-          </FormButtons>
+          </ResponsiveFormButtons>
         </Column>
       </Form>
     );
@@ -269,14 +294,14 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
       >
         <PasswordField autoComplete="current-password" />
       </FormField>
-      <FormButtons>
-        <Button variant="quiet" onPress={onClose}>
+      <ResponsiveFormButtons>
+        <Button variant="quiet" style={actionButtonStyle} onPress={onClose}>
           {formatMessage(labels.cancel)}
         </Button>
-        <FormSubmitButton isDisabled={isPending} variant="primary">
+        <FormSubmitButton isDisabled={isPending} variant="primary" style={actionButtonStyle}>
           {formatMessage(labels.continue)}
         </FormSubmitButton>
-      </FormButtons>
+      </ResponsiveFormButtons>
     </Form>
   );
 }
@@ -284,9 +309,11 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
 function DisableTwoFactorForm({ user, setUser, onClose }: any) {
   const { post } = useApi();
   const { formatMessage, labels, messages, getErrorMessage } = useMessages();
+  const { isPhone } = useMobile();
   const { toast } = useToast();
   const [error, setError] = useState<ApiError>(null);
   const [isPending, setIsPending] = useState(false);
+  const actionButtonStyle = isPhone ? fullWidthStyle : undefined;
 
   const handleDisable = async ({ currentPassword }: Record<string, string>) => {
     setIsPending(true);
@@ -314,14 +341,14 @@ function DisableTwoFactorForm({ user, setUser, onClose }: any) {
       >
         <PasswordField autoComplete="current-password" />
       </FormField>
-      <FormButtons>
-        <Button variant="quiet" onPress={onClose}>
+      <ResponsiveFormButtons>
+        <Button variant="quiet" style={actionButtonStyle} onPress={onClose}>
           {formatMessage(labels.cancel)}
         </Button>
-        <FormSubmitButton isDisabled={isPending} variant="danger">
+        <FormSubmitButton isDisabled={isPending} variant="danger" style={actionButtonStyle}>
           {formatMessage(labels.disableTwoFactor)}
         </FormSubmitButton>
-      </FormButtons>
+      </ResponsiveFormButtons>
     </Form>
   );
 }
@@ -329,10 +356,12 @@ function DisableTwoFactorForm({ user, setUser, onClose }: any) {
 function RecoveryCodesForm({ onClose }: any) {
   const { post } = useApi();
   const { formatMessage, labels, messages, getErrorMessage } = useMessages();
+  const { isPhone } = useMobile();
   const { toast } = useToast();
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
   const [error, setError] = useState<ApiError>(null);
   const [isPending, setIsPending] = useState(false);
+  const actionButtonStyle = isPhone ? fullWidthStyle : undefined;
 
   const handleCopyRecoveryCodes = async () => {
     const success = await copyToClipboard(recoveryCodes.join('\n'));
@@ -367,11 +396,11 @@ function RecoveryCodesForm({ onClose }: any) {
           copiedLabel={formatMessage(labels.copied)}
           onCopy={handleCopyRecoveryCodes}
         />
-        <FormButtons>
-          <Button variant="primary" onPress={onClose}>
+        <ResponsiveFormButtons>
+          <Button variant="primary" style={actionButtonStyle} onPress={onClose}>
             {formatMessage(labels.ok)}
           </Button>
-        </FormButtons>
+        </ResponsiveFormButtons>
       </Column>
     );
   }
@@ -385,26 +414,29 @@ function RecoveryCodesForm({ onClose }: any) {
       >
         <PasswordField autoComplete="current-password" />
       </FormField>
-      <FormButtons>
-        <Button variant="quiet" onPress={onClose}>
+      <ResponsiveFormButtons>
+        <Button variant="quiet" style={actionButtonStyle} onPress={onClose}>
           {formatMessage(labels.cancel)}
         </Button>
-        <FormSubmitButton isDisabled={isPending} variant="primary">
+        <FormSubmitButton isDisabled={isPending} variant="primary" style={actionButtonStyle}>
           {formatMessage(labels.regenerateRecoveryCodes)}
         </FormSubmitButton>
-      </FormButtons>
+      </ResponsiveFormButtons>
     </Form>
   );
 }
 
 export function TwoFactorSettingsButton({ user, setUser }: TwoFactorSettingsButtonProps) {
   const { formatMessage, labels } = useMessages();
+  const { isPhone } = useMobile();
+  const actionButtonStyle = isPhone ? fullWidthStyle : undefined;
+  const actionRowStyle = isPhone ? fullWidthStyle : undefined;
 
   if (!user?.twoFactorEnabled) {
     return (
-      <Row gap="2" wrap="wrap">
+      <Row gap="2" wrap="wrap" style={actionRowStyle}>
         <DialogTrigger>
-          <Button data-test="button-two-factor-enable" variant="primary">
+          <Button data-test="button-two-factor-enable" variant="primary" style={actionButtonStyle}>
             {formatMessage(labels.enableTwoFactor)}
           </Button>
           <TwoFactorDialog title={formatMessage(labels.enableTwoFactor)}>
@@ -416,9 +448,9 @@ export function TwoFactorSettingsButton({ user, setUser }: TwoFactorSettingsButt
   }
 
   return (
-    <Row gap="2" wrap="wrap">
+    <Row gap="2" wrap="wrap" style={actionRowStyle}>
       <DialogTrigger>
-        <Button data-test="button-two-factor-disable" variant="danger">
+        <Button data-test="button-two-factor-disable" variant="danger" style={actionButtonStyle}>
           {formatMessage(labels.disableTwoFactor)}
         </Button>
         <TwoFactorDialog title={formatMessage(labels.disableTwoFactor)}>
@@ -426,7 +458,7 @@ export function TwoFactorSettingsButton({ user, setUser }: TwoFactorSettingsButt
         </TwoFactorDialog>
       </DialogTrigger>
       <DialogTrigger>
-        <Button data-test="button-two-factor-recovery" variant="quiet">
+        <Button data-test="button-two-factor-recovery" variant="quiet" style={actionButtonStyle}>
           {formatMessage(labels.regenerateRecoveryCodes)}
         </Button>
         <TwoFactorDialog title={formatMessage(labels.recoveryCodes)}>

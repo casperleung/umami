@@ -14,7 +14,7 @@ import {
 } from '@umami/react-zen';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useMessages, useUpdateQuery } from '@/components/hooks';
+import { useMessages, useMobile, useUpdateQuery } from '@/components/hooks';
 import { Logo } from '@/components/svg';
 import {
   getClientTwoFactorTrustToken,
@@ -26,11 +26,13 @@ import { setUser } from '@/store/app';
 
 export function LoginForm() {
   const { formatMessage, labels, messages, getErrorMessage } = useMessages();
+  const { isPhone } = useMobile();
   const router = useRouter();
   const login = useUpdateQuery('/auth/login');
   const verify = useUpdateQuery('/auth/login/2fa');
   const [challengeToken, setChallengeToken] = useState<string>(null);
   const [rememberDevice, setRememberDevice] = useState(false);
+  const actionButtonStyle = isPhone ? { width: '100%' } : undefined;
 
   const completeLogin = async ({ token, user, trustedToken }: any) => {
     setClientAuthToken(token);
@@ -81,7 +83,7 @@ export function LoginForm() {
       </Icon>
       <Heading>umami</Heading>
       {challengeToken ? (
-        <Form onSubmit={handleVerify} error={getErrorMessage(error)}>
+        <Form onSubmit={handleVerify} error={getErrorMessage(error)} style={{ width: '100%' }}>
           <Text color="muted">{formatMessage(messages.twoFactorPrompt)}</Text>
           <FormField
             label={formatMessage(labels.twoFactorCode)}
@@ -94,19 +96,40 @@ export function LoginForm() {
           <Switch isSelected={rememberDevice} onChange={setRememberDevice}>
             {formatMessage(labels.trustDevice30Days)}
           </Switch>
-          <FormButtons>
-            <Button
-              onPress={() => {
-                setRememberDevice(false);
-                setChallengeToken(null);
-              }}
-            >
-              {formatMessage(labels.back)}
-            </Button>
-            <FormSubmitButton data-test="button-two-factor-submit" isDisabled={verify.isPending}>
-              {formatMessage(labels.verify)}
-            </FormSubmitButton>
-          </FormButtons>
+          {isPhone ? (
+            <Column gap="2">
+              <Button
+                style={actionButtonStyle}
+                onPress={() => {
+                  setRememberDevice(false);
+                  setChallengeToken(null);
+                }}
+              >
+                {formatMessage(labels.back)}
+              </Button>
+              <FormSubmitButton
+                data-test="button-two-factor-submit"
+                isDisabled={verify.isPending}
+                style={actionButtonStyle}
+              >
+                {formatMessage(labels.verify)}
+              </FormSubmitButton>
+            </Column>
+          ) : (
+            <FormButtons>
+              <Button
+                onPress={() => {
+                  setRememberDevice(false);
+                  setChallengeToken(null);
+                }}
+              >
+                {formatMessage(labels.back)}
+              </Button>
+              <FormSubmitButton data-test="button-two-factor-submit" isDisabled={verify.isPending}>
+                {formatMessage(labels.verify)}
+              </FormSubmitButton>
+            </FormButtons>
+          )}
         </Form>
       ) : (
         <Form onSubmit={handleSubmit} error={getErrorMessage(error)}>
