@@ -45,11 +45,18 @@ export async function POST(request: Request) {
     return unauthorized({ code: 'expired-two-factor-challenge' });
   }
 
-  const secretCode = decryptTwoFactorSecret(user.twoFactorSecret);
   let data: Record<string, any> = {
     twoFactorChallenge: null,
   };
-  let valid = validateTotpCode(secretCode, code);
+  let valid = false;
+
+  try {
+    const secretCode = decryptTwoFactorSecret(user.twoFactorSecret);
+    valid = validateTotpCode(secretCode, code);
+  } catch {
+    // If secret decryption fails (e.g. key rotation mismatch), still allow recovery code fallback.
+    valid = false;
+  }
 
   if (!valid) {
     const hashes = getRecoveryCodeHashes(user.twoFactorRecoveryCodes);

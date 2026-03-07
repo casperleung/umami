@@ -31,7 +31,46 @@ export async function request(
     },
     body,
   }).then(async res => {
-    const data = await res.json();
+    let data: any = null;
+    const contentType = res.headers.get('content-type') || '';
+
+    if (res.status === 204) {
+      data = {};
+    } else if (contentType.includes('application/json')) {
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
+    }
+
+    if (data === null) {
+      const text = await res.text().catch(() => '');
+
+      if (!text) {
+        data = res.ok
+          ? {}
+          : {
+              error: {
+                status: res.status,
+                message: res.statusText || 'Unexpected empty response',
+              },
+            };
+      } else {
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = res.ok
+            ? { message: text }
+            : {
+                error: {
+                  status: res.status,
+                  message: text,
+                },
+              };
+        }
+      }
+    }
 
     return {
       ok: res.ok,
