@@ -1,4 +1,4 @@
-import { Column, Label, Row } from '@umami/react-zen';
+import { Column, Label, Row, TextField } from '@umami/react-zen';
 import { useConfig, useLoginQuery, useMessages } from '@/components/hooks';
 import { ROLES } from '@/lib/constants';
 import { PasswordChangeButton } from './PasswordChangeButton';
@@ -30,26 +30,40 @@ export function ProfileSettings() {
   };
 
   return (
-    <Column width="400px" gap="6">
-      <Column>
+    <Column width="100%" gap="8">
+      <Column gap="1">
         <Label>{formatMessage(labels.username)}</Label>
-        {username}
+        <TextField value={username} isReadOnly />
       </Column>
-      <Column>
+      <Column gap="1">
         <Label>{formatMessage(labels.role)}</Label>
-        {renderRole(role)}
+        <TextField value={renderRole(role)} isReadOnly />
       </Column>
       {!cloudMode && (
-        <Column>
-          <Label>{formatMessage(labels.password)}</Label>
-          <PasswordChangeButton />
+        <Column gap="4" paddingTop="4" border="top">
+          <Row
+            wrap="wrap"
+            gap="3"
+            justifyContent="space-between"
+            alignItems={{ xs: 'flex-start', sm: 'center' }}
+          >
+            <Label>{formatMessage(labels.password)}</Label>
+            <PasswordChangeButton />
+          </Row>
         </Column>
       )}
       {!cloudMode && (
-        <Column>
-          <Label>{formatMessage(labels.twoFactorAuthentication)}</Label>
-          <Row wrap="wrap" gap="2">
-            <TwoFactorSettingsButton user={user} setUser={setUser} />
+        <Column gap="4">
+          <Row
+            wrap="wrap"
+            gap="3"
+            justifyContent="space-between"
+            alignItems={{ xs: 'flex-start', sm: 'center' }}
+          >
+            <Label>{formatMessage(labels.twoFactorAuthentication)}</Label>
+            <Row wrap="wrap" gap="2">
+              <TwoFactorSettingsButton user={user} setUser={setUser} />
+            </Row>
           </Row>
         </Column>
       )}

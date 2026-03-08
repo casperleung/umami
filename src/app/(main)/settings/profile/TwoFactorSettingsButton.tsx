@@ -458,7 +458,7 @@ export function TwoFactorSettingsButton({ user, setUser }: TwoFactorSettingsButt
         </TwoFactorDialog>
       </DialogTrigger>
       <DialogTrigger>
-        <Button data-test="button-two-factor-recovery" variant="quiet" style={actionButtonStyle}>
+        <Button data-test="button-two-factor-recovery" style={actionButtonStyle}>
           {formatMessage(labels.regenerateRecoveryCodes)}
         </Button>
         <TwoFactorDialog title={formatMessage(labels.recoveryCodes)}>
