@@ -9,7 +9,6 @@ env:
 
 jobs:
   build:
-    if: github.repository == 'umami-software/umami'
     runs-on: ubuntu-latest
 
     steps:
