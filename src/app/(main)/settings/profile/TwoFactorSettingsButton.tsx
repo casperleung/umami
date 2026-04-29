@@ -7,7 +7,7 @@ import {
   FormButtons,
   FormField,
   FormSubmitButton,
-  IconLabel,
+  Icon,
   Label,
   Modal,
   PasswordField,
@@ -157,10 +157,8 @@ function RecoveryCodes({
           data-test="button-copy-recovery-codes"
           style={actionStyle}
         >
-          <IconLabel
-            icon={copied ? <Check size={16} /> : <Copy size={16} />}
-            label={copied ? copiedLabel : copyLabel}
-          />
+          <Icon>{copied ? <Check size={16} /> : <Copy size={16} />}</Icon>
+          <Text>{copied ? copiedLabel : copyLabel}</Text>
         </Button>
       </Row>
       <pre style={recoveryCodesStyle}>{codes.join('\n')}</pre>
@@ -170,7 +168,7 @@ function RecoveryCodes({
 
 function EnableTwoFactorForm({ user, setUser, onClose }: any) {
   const { post } = useApi();
-  const { formatMessage, labels, messages, getErrorMessage } = useMessages();
+  const { t, labels, messages, getErrorMessage } = useMessages();
   const { isPhone } = useMobile();
   const { toast } = useToast();
   const [setup, setSetup] = useState<any>(null);
@@ -182,7 +180,7 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
   const handleCopyRecoveryCodes = async () => {
     const success = await copyToClipboard(recoveryCodes.join('\n'));
     if (!success) {
-      toast(formatMessage(messages.twoFactorRecoveryCopyFailed));
+      toast(t(messages.twoFactorRecoveryCopyFailed));
     }
 
     return success;
@@ -213,7 +211,7 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
       });
 
       setRecoveryCodes(data.recoveryCodes || []);
-      toast(formatMessage(messages.saved));
+      toast(t(messages.saved));
     } catch (e) {
       setError(e as ApiError);
     } finally {
@@ -224,12 +222,12 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
   if (recoveryCodes.length) {
     return (
       <Column gap="4">
-        <Label>{formatMessage(messages.twoFactorSetupStepRecovery)}</Label>
-        <Text color="muted">{formatMessage(messages.twoFactorRecoveryWarning)}</Text>
+        <Label>{t(messages.twoFactorSetupStepRecovery)}</Label>
+        <Text color="muted">{t(messages.twoFactorRecoveryWarning)}</Text>
         <RecoveryCodes
           codes={recoveryCodes}
-          copyLabel={formatMessage(labels.copyCodes)}
-          copiedLabel={formatMessage(labels.copied)}
+          copyLabel={t(labels.copyCodes)}
+          copiedLabel={t(labels.copied)}
           onCopy={handleCopyRecoveryCodes}
         />
         <ResponsiveFormButtons>
@@ -241,7 +239,7 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
               onClose();
             }}
           >
-            {formatMessage(labels.iSavedRecoveryCodes)}
+            {t(labels.iSavedRecoveryCodes)}
           </Button>
         </ResponsiveFormButtons>
       </Column>
@@ -252,31 +250,31 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
     return (
       <Form onSubmit={handleVerify} error={getErrorMessage(error)}>
         <Column gap="4">
-          <Label>{formatMessage(messages.twoFactorSetupStepScan)}</Label>
-          <Text color="muted">{formatMessage(messages.twoFactorSetupPrompt)}</Text>
+          <Label>{t(messages.twoFactorSetupStepScan)}</Label>
+          <Text color="muted">{t(messages.twoFactorSetupPrompt)}</Text>
           {setup.qrCodeDataUrl && (
             <div style={qrCodeWrapperStyle}>
               <img src={setup.qrCodeDataUrl} alt="Two-factor QR code" style={qrCodeStyle} />
             </div>
           )}
           <Column gap="1">
-            <Label>{formatMessage(labels.manualKey)}</Label>
+            <Label>{t(labels.manualKey)}</Label>
             <TextField value={setup.manualCode} isReadOnly allowCopy autoComplete="off" />
           </Column>
-          <Label>{formatMessage(messages.twoFactorSetupStepVerify)}</Label>
+          <Label>{t(messages.twoFactorSetupStepVerify)}</Label>
           <FormField
-            label={formatMessage(labels.twoFactorCode)}
+            label={t(labels.twoFactorCode)}
             name="code"
-            rules={{ required: formatMessage(labels.required) }}
+            rules={{ required: t(labels.required) }}
           >
             <TextField autoComplete="one-time-code" inputMode="numeric" placeholder="123456" />
           </FormField>
           <ResponsiveFormButtons>
             <Button variant="quiet" style={actionButtonStyle} onPress={() => setSetup(null)}>
-              {formatMessage(labels.back)}
+              {t(labels.back)}
             </Button>
             <FormSubmitButton isDisabled={isPending} variant="primary" style={actionButtonStyle}>
-              {formatMessage(labels.verify)}
+              {t(labels.verify)}
             </FormSubmitButton>
           </ResponsiveFormButtons>
         </Column>
@@ -286,20 +284,20 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
 
   return (
     <Form onSubmit={handlePassword} error={getErrorMessage(error)}>
-      <Text color="muted">{formatMessage(messages.twoFactorSetupIntro)}</Text>
+      <Text color="muted">{t(messages.twoFactorSetupIntro)}</Text>
       <FormField
-        label={formatMessage(labels.currentPassword)}
+        label={t(labels.currentPassword)}
         name="currentPassword"
-        rules={{ required: formatMessage(labels.required) }}
+        rules={{ required: t(labels.required) }}
       >
         <PasswordField autoComplete="current-password" />
       </FormField>
       <ResponsiveFormButtons>
         <Button variant="quiet" style={actionButtonStyle} onPress={onClose}>
-          {formatMessage(labels.cancel)}
+          {t(labels.cancel)}
         </Button>
         <FormSubmitButton isDisabled={isPending} variant="primary" style={actionButtonStyle}>
-          {formatMessage(labels.continue)}
+          {t(labels.continue)}
         </FormSubmitButton>
       </ResponsiveFormButtons>
     </Form>
@@ -308,7 +306,7 @@ function EnableTwoFactorForm({ user, setUser, onClose }: any) {
 
 function DisableTwoFactorForm({ user, setUser, onClose }: any) {
   const { post } = useApi();
-  const { formatMessage, labels, messages, getErrorMessage } = useMessages();
+  const { t, labels, messages, getErrorMessage } = useMessages();
   const { isPhone } = useMobile();
   const { toast } = useToast();
   const [error, setError] = useState<ApiError>(null);
@@ -323,7 +321,7 @@ function DisableTwoFactorForm({ user, setUser, onClose }: any) {
       await post('/me/2fa/disable', { currentPassword });
       removeClientTwoFactorTrustToken();
       setUser({ ...user, twoFactorEnabled: false });
-      toast(formatMessage(messages.saved));
+      toast(t(messages.saved));
       onClose();
     } catch (e) {
       setError(e as ApiError);
@@ -335,18 +333,18 @@ function DisableTwoFactorForm({ user, setUser, onClose }: any) {
   return (
     <Form onSubmit={handleDisable} error={getErrorMessage(error)}>
       <FormField
-        label={formatMessage(labels.currentPassword)}
+        label={t(labels.currentPassword)}
         name="currentPassword"
-        rules={{ required: formatMessage(labels.required) }}
+        rules={{ required: t(labels.required) }}
       >
         <PasswordField autoComplete="current-password" />
       </FormField>
       <ResponsiveFormButtons>
         <Button variant="quiet" style={actionButtonStyle} onPress={onClose}>
-          {formatMessage(labels.cancel)}
+          {t(labels.cancel)}
         </Button>
         <FormSubmitButton isDisabled={isPending} variant="danger" style={actionButtonStyle}>
-          {formatMessage(labels.disableTwoFactor)}
+          {t(labels.disableTwoFactor)}
         </FormSubmitButton>
       </ResponsiveFormButtons>
     </Form>
@@ -355,7 +353,7 @@ function DisableTwoFactorForm({ user, setUser, onClose }: any) {
 
 function RecoveryCodesForm({ onClose }: any) {
   const { post } = useApi();
-  const { formatMessage, labels, messages, getErrorMessage } = useMessages();
+  const { t, labels, messages, getErrorMessage } = useMessages();
   const { isPhone } = useMobile();
   const { toast } = useToast();
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
@@ -366,7 +364,7 @@ function RecoveryCodesForm({ onClose }: any) {
   const handleCopyRecoveryCodes = async () => {
     const success = await copyToClipboard(recoveryCodes.join('\n'));
     if (!success) {
-      toast(formatMessage(messages.twoFactorRecoveryCopyFailed));
+      toast(t(messages.twoFactorRecoveryCopyFailed));
     }
 
     return success;
@@ -389,16 +387,16 @@ function RecoveryCodesForm({ onClose }: any) {
   if (recoveryCodes.length) {
     return (
       <Column gap="4">
-        <Text color="muted">{formatMessage(messages.twoFactorRecoveryWarning)}</Text>
+        <Text color="muted">{t(messages.twoFactorRecoveryWarning)}</Text>
         <RecoveryCodes
           codes={recoveryCodes}
-          copyLabel={formatMessage(labels.copyCodes)}
-          copiedLabel={formatMessage(labels.copied)}
+          copyLabel={t(labels.copyCodes)}
+          copiedLabel={t(labels.copied)}
           onCopy={handleCopyRecoveryCodes}
         />
         <ResponsiveFormButtons>
           <Button variant="primary" style={actionButtonStyle} onPress={onClose}>
-            {formatMessage(labels.ok)}
+            {t(labels.ok)}
           </Button>
         </ResponsiveFormButtons>
       </Column>
@@ -408,18 +406,18 @@ function RecoveryCodesForm({ onClose }: any) {
   return (
     <Form onSubmit={handleRegenerate} error={getErrorMessage(error)}>
       <FormField
-        label={formatMessage(labels.currentPassword)}
+        label={t(labels.currentPassword)}
         name="currentPassword"
-        rules={{ required: formatMessage(labels.required) }}
+        rules={{ required: t(labels.required) }}
       >
         <PasswordField autoComplete="current-password" />
       </FormField>
       <ResponsiveFormButtons>
         <Button variant="quiet" style={actionButtonStyle} onPress={onClose}>
-          {formatMessage(labels.cancel)}
+          {t(labels.cancel)}
         </Button>
         <FormSubmitButton isDisabled={isPending} variant="primary" style={actionButtonStyle}>
-          {formatMessage(labels.regenerateRecoveryCodes)}
+          {t(labels.regenerateRecoveryCodes)}
         </FormSubmitButton>
       </ResponsiveFormButtons>
     </Form>
@@ -427,7 +425,7 @@ function RecoveryCodesForm({ onClose }: any) {
 }
 
 export function TwoFactorSettingsButton({ user, setUser }: TwoFactorSettingsButtonProps) {
-  const { formatMessage, labels } = useMessages();
+  const { t, labels } = useMessages();
   const { isPhone } = useMobile();
   const actionButtonStyle = isPhone ? fullWidthStyle : undefined;
   const actionRowStyle = isPhone ? fullWidthStyle : undefined;
@@ -437,9 +435,9 @@ export function TwoFactorSettingsButton({ user, setUser }: TwoFactorSettingsButt
       <Row gap="2" wrap="wrap" style={actionRowStyle}>
         <DialogTrigger>
           <Button data-test="button-two-factor-enable" variant="primary" style={actionButtonStyle}>
-            {formatMessage(labels.enableTwoFactor)}
+            {t(labels.enableTwoFactor)}
           </Button>
-          <TwoFactorDialog title={formatMessage(labels.enableTwoFactor)}>
+          <TwoFactorDialog title={t(labels.enableTwoFactor)}>
             {({ close }) => <EnableTwoFactorForm user={user} setUser={setUser} onClose={close} />}
           </TwoFactorDialog>
         </DialogTrigger>
@@ -451,17 +449,17 @@ export function TwoFactorSettingsButton({ user, setUser }: TwoFactorSettingsButt
     <Row gap="2" wrap="wrap" style={actionRowStyle}>
       <DialogTrigger>
         <Button data-test="button-two-factor-disable" variant="danger" style={actionButtonStyle}>
-          {formatMessage(labels.disableTwoFactor)}
+          {t(labels.disableTwoFactor)}
         </Button>
-        <TwoFactorDialog title={formatMessage(labels.disableTwoFactor)}>
+        <TwoFactorDialog title={t(labels.disableTwoFactor)}>
           {({ close }) => <DisableTwoFactorForm user={user} setUser={setUser} onClose={close} />}
         </TwoFactorDialog>
       </DialogTrigger>
       <DialogTrigger>
         <Button data-test="button-two-factor-recovery" style={actionButtonStyle}>
-          {formatMessage(labels.regenerateRecoveryCodes)}
+          {t(labels.regenerateRecoveryCodes)}
         </Button>
-        <TwoFactorDialog title={formatMessage(labels.recoveryCodes)}>
+        <TwoFactorDialog title={t(labels.recoveryCodes)}>
           {({ close }) => <RecoveryCodesForm onClose={close} />}
         </TwoFactorDialog>
       </DialogTrigger>
