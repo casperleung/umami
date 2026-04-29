@@ -5,6 +5,7 @@ export default {
     '^.+\\.(ts|tsx)$': 'ts-jest',
   },
   moduleNameMapper: {
+    '^uuid$': '<rootDir>/src/__mocks__/uuid.ts',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
 };
