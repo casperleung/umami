@@ -6,7 +6,7 @@ import { TwoFactorSettingsButton } from './TwoFactorSettingsButton';
 
 export function ProfileSettings() {
   const { user, setUser } = useLoginQuery();
-  const { formatMessage, labels } = useMessages();
+  const { t, labels } = useMessages();
   const { cloudMode } = useConfig();
 
   if (!user) {
@@ -17,37 +17,32 @@ export function ProfileSettings() {
 
   const renderRole = (value: string) => {
     if (value === ROLES.user) {
-      return formatMessage(labels.user);
+      return t(labels.user);
     }
     if (value === ROLES.admin) {
-      return formatMessage(labels.admin);
+      return t(labels.admin);
     }
     if (value === ROLES.viewOnly) {
-      return formatMessage(labels.viewOnly);
+      return t(labels.viewOnly);
     }
 
-    return formatMessage(labels.unknown);
+    return t(labels.unknown);
   };
 
   return (
-    <Column width="100%" gap="8">
-      <Column gap="1">
-        <Label>{formatMessage(labels.username)}</Label>
-        <TextField value={username} isReadOnly />
+    <Column gap="6">
+      <Column>
+        <Label>{t(labels.username)}</Label>
+        {username}
       </Column>
-      <Column gap="1">
-        <Label>{formatMessage(labels.role)}</Label>
-        <TextField value={renderRole(role)} isReadOnly />
+      <Column>
+        <Label>{t(labels.role)}</Label>
+        {renderRole(role)}
       </Column>
       {!cloudMode && (
-        <Column gap="4" paddingTop="4" border="top">
-          <Row
-            wrap="wrap"
-            gap="3"
-            justifyContent="space-between"
-            alignItems={{ xs: 'flex-start', sm: 'center' }}
-          >
-            <Label>{formatMessage(labels.password)}</Label>
+        <Column>
+          <Label>{t(labels.password)}</Label>
+          <Row>
             <PasswordChangeButton />
           </Row>
         </Column>
@@ -60,7 +55,7 @@ export function ProfileSettings() {
             justifyContent="space-between"
             alignItems={{ xs: 'flex-start', sm: 'center' }}
           >
-            <Label>{formatMessage(labels.twoFactorAuthentication)}</Label>
+            <Label>{t(labels.twoFactorAuthentication)}</Label>
             <Row wrap="wrap" gap="2">
               <TwoFactorSettingsButton user={user} setUser={setUser} />
             </Row>

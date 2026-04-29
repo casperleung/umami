@@ -25,7 +25,7 @@ import {
 import { setUser } from '@/store/app';
 
 export function LoginForm() {
-  const { formatMessage, labels, messages, getErrorMessage } = useMessages();
+  const { t, labels, messages, getErrorMessage } = useMessages();
   const { isPhone } = useMobile();
   const router = useRouter();
   const login = useUpdateQuery('/auth/login');
@@ -84,17 +84,17 @@ export function LoginForm() {
       <Heading>umami</Heading>
       {challengeToken ? (
         <Form onSubmit={handleVerify} error={getErrorMessage(error)} style={{ width: '100%' }}>
-          <Text color="muted">{formatMessage(messages.twoFactorPrompt)}</Text>
+          <Text color="muted">{t(messages.twoFactorPrompt)}</Text>
           <FormField
-            label={formatMessage(labels.twoFactorCode)}
+            label={t(labels.twoFactorCode)}
             data-test="input-two-factor-code"
             name="code"
-            rules={{ required: formatMessage(labels.required) }}
+            rules={{ required: t(labels.required) }}
           >
             <TextField autoComplete="one-time-code" />
           </FormField>
           <Switch isSelected={rememberDevice} onChange={setRememberDevice}>
-            {formatMessage(labels.trustDevice30Days)}
+            {t(labels.trustDevice30Days)}
           </Switch>
           {isPhone ? (
             <Column gap="2">
@@ -105,14 +105,14 @@ export function LoginForm() {
                   setChallengeToken(null);
                 }}
               >
-                {formatMessage(labels.back)}
+                {t(labels.back)}
               </Button>
               <FormSubmitButton
                 data-test="button-two-factor-submit"
                 isDisabled={verify.isPending}
                 style={actionButtonStyle}
               >
-                {formatMessage(labels.verify)}
+                {t(labels.verify)}
               </FormSubmitButton>
             </Column>
           ) : (
@@ -123,30 +123,30 @@ export function LoginForm() {
                   setChallengeToken(null);
                 }}
               >
-                {formatMessage(labels.back)}
+                {t(labels.back)}
               </Button>
               <FormSubmitButton data-test="button-two-factor-submit" isDisabled={verify.isPending}>
-                {formatMessage(labels.verify)}
+                {t(labels.verify)}
               </FormSubmitButton>
             </FormButtons>
           )}
         </Form>
       ) : (
-        <Form onSubmit={handleSubmit} error={getErrorMessage(error)}>
+        <Form onSubmit={handleSubmit} error={getErrorMessage(error)} style={{ minWidth: 300 }}>
           <FormField
-            label={formatMessage(labels.username)}
+            label={t(labels.username)}
             data-test="input-username"
             name="username"
-            rules={{ required: formatMessage(labels.required) }}
+            rules={{ required: t(labels.required) }}
           >
             <TextField autoComplete="username" />
           </FormField>
 
           <FormField
-            label={formatMessage(labels.password)}
+            label={t(labels.password)}
             data-test="input-password"
             name="password"
-            rules={{ required: formatMessage(labels.required) }}
+            rules={{ required: t(labels.required) }}
           >
             <PasswordField autoComplete="current-password" />
           </FormField>
@@ -157,7 +157,7 @@ export function LoginForm() {
               style={{ flex: 1 }}
               isDisabled={login.isPending}
             >
-              {formatMessage(labels.login)}
+              {t(labels.login)}
             </FormSubmitButton>
           </FormButtons>
         </Form>
