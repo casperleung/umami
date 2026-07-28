@@ -1,41 +1,71 @@
-name: Auto Sync and Patch
+name: Sync upstream (PR-based)
 on:
   schedule:
     - cron: '0 0 * * 0' # Runs every Sunday at midnight UTC
   workflow_dispatch: # Allows you to trigger it manually
 
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
 jobs:
-  sync-and-patch:
+  sync-upstream:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
-      - name: Sync and Patch package.json
+
+      - name: Sync upstream into a branch and open a PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
+
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          
-          # 1. Fetch the latest official Umami code
+
           git remote add upstream https://github.com/umami-software/umami.git
-          git fetch upstream
-          
-          # 2. Merge it. If there is a conflict, automatically accept Umami's version
-          git merge upstream/master -X theirs --no-edit
-          
-          # 3. Use 'jq' to safely target and overwrite our specific build script
-          jq '.scripts.build = "npm-run-all check-env build-db build-tracker build-geo build-app"' package.json > package.tmp.json
-          mv package.tmp.json package.json
-          
-          # 4. Stage the patched file
-          git add package.json
-          
-          # 5. Commit only if changes were actually made
-          if ! git diff --cached --quiet; then
-            git commit -m "Auto-patched package.json to remove check-db step"
+          git fetch upstream master
+
+          if [ -z "$(git rev-list HEAD..upstream/master)" ]; then
+            echo "Already up to date with upstream/master. Nothing to do."
+            exit 0
           fi
-          
-          # 6. Push the final version to your repository
-          git push origin master
+
+          branch="sync/upstream-$(date +%Y-%m-%d)"
+
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            echo "Branch $branch already exists on origin. A sync PR is likely already open."
+            exit 0
+          fi
+
+          git checkout -b "$branch"
+
+          # Never auto-resolve conflicts (e.g. -X theirs): that can silently
+          # overwrite fork-specific code (auth, 2FA, etc.). If the merge
+          # doesn't apply cleanly, back out and file an issue for a human
+          # (or Claude) to resolve instead of pushing broken/lossy state.
+          if git merge upstream/master --no-edit; then
+            git push origin "$branch"
+
+            gh pr create \
+              --title "Sync upstream/master ($(date +%Y-%m-%d))" \
+              --body "Automated merge of umami-software/umami:master. Clean merge, no conflicts. Review before merging, especially anything touching auth/2FA-related files." \
+              --head "$branch" \
+              --base master
+          else
+            git merge --abort
+
+            gh issue create \
+              --title "Upstream sync needs manual merge ($(date +%Y-%m-%d))" \
+              --body "Merging upstream/master into master produced conflicts that need manual resolution (likely touching fork-specific code such as 2FA). Run the merge locally:
+          \`\`\`
+          git fetch upstream master
+          git checkout -b sync/upstream-$(date +%Y-%m-%d)
+          git merge upstream/master
+          \`\`\`
+          then resolve conflicts, push the branch, and open a PR."
+          fi
