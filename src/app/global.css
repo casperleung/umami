@@ -67,14 +67,22 @@ select:is(:-webkit-autofill, :autofill):focus {
   min-height: 100px;
 }
 
-/* @umami/react-zen's Switch thumb uses bg-surface-base, which equals the
-   dark theme's page background, making the unchecked (off) state nearly
-   invisible. Give the thumb a fixed mid-tone so it's visible in both
-   states and both themes.
+/* @umami/react-zen's Switch: the thumb (bg-surface-base) and the track's
+   off-state fill (bg-interactive) both happen to equal --gray-800 in this
+   app's dark theme (--surface-raised, the page background, is also
+   --gray-800), so with no fix at all the whole control -- track, thumb,
+   and page -- is a single indistinguishable shade. Fixing only the thumb
+   left a "floating dot" with no visible track outline, so this also puts
+   a border on the track to make the switch read as a shape regardless of
+   how the fill colors happen to compare to the page background.
    Note: react-aria-components only applies its default "react-aria-Switch"
    class when no className prop is given, and react-zen's Switch always
    passes one -- so that class never actually appears in the rendered DOM
    here. Target the track's distinctive utility classes instead. */
+.w-10.h-6.px-1.rounded-full.bg-interactive {
+  border: 1px solid var(--border-default);
+}
+
 .w-10.h-6.px-1.rounded-full.bg-interactive > div {
   background-color: var(--gray-400);
 }
