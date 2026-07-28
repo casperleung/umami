@@ -53,7 +53,7 @@ export function ProfileSettings() {
             wrap="wrap"
             gap="3"
             justifyContent="space-between"
-            alignItems={{ xs: 'flex-start', sm: 'center' }}
+            alignItems="center"
           >
             <Label>{t(labels.twoFactorAuthentication)}</Label>
             <Row wrap="wrap" gap="2">

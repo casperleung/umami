@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     await updateUser(id, { twoFactorChallenge: null });
   }
 
-  const token = await createAuthToken(id, role);
+  const token = await createAuthToken(id, role, user.password);
   const teams = await getAllUserTeams(id);
 
   return json({

@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     return unauthorized({ code: 'expired-two-factor-challenge' });
   }
 
-  const token = await createAuthToken(user.id, user.role);
+  const token = await createAuthToken(user.id, user.role, user.password);
   const teams = await getAllUserTeams(user.id);
   const trustedToken =
     rememberDevice && user.password && user.twoFactorSecret
