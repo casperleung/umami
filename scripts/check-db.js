@@ -71,14 +71,26 @@ async function checkDatabaseVersion() {
 
 async function applyMigration() {
   if (!process.env.SKIP_DB_MIGRATION) {
-    console.log(
-      execSync('prisma migrate deploy', {
-        env: {
-          ...process.env,
-          DATABASE_URL: process.env.DIRECT_URL || process.env.DATABASE_URL,
-        },
-      }).toString(),
-    );
+    try {
+      console.log(
+        execSync('prisma migrate deploy', {
+          env: {
+            ...process.env,
+            DATABASE_URL: process.env.DIRECT_URL || process.env.DATABASE_URL,
+          },
+          // Bound this: it's a synchronous call, so a stuck child (e.g. lock
+          // contention from a migrate deploy that already ran earlier in the
+          // same build) would otherwise hang the whole build indefinitely
+          // with no further log output until the platform's build timeout.
+          timeout: 120_000,
+        }).toString(),
+      );
+    } catch (e) {
+      if (e.signal === 'SIGTERM') {
+        throw new Error('prisma migrate deploy timed out after 120s (possible lock contention).');
+      }
+      throw e;
+    }
 
     success('Database is up to date.');
   }
@@ -98,4 +110,7 @@ async function applyMigration() {
       }
     }
   }
+
+  await prisma.$disconnect();
+  process.exit(0);
 })();
