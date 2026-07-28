@@ -389,7 +389,20 @@
     "website-id": "Website ID",
     "websites": "Websites",
     "window": "Window",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "two-factor-authentication": "Two-factor authentication",
+    "two-factor-code": "Authentication code",
+    "recovery-code": "Recovery code",
+    "recovery-codes": "Recovery codes",
+    "enable-two-factor": "Enable 2FA",
+    "disable-two-factor": "Disable 2FA",
+    "regenerate-recovery-codes": "Regenerate recovery codes",
+    "copy-codes": "Copy codes",
+    "copied": "Copied",
+    "i-saved-recovery-codes": "I saved these codes",
+    "trust-device-30-days": "Trust this device for 30 days",
+    "verify": "Verify",
+    "manual-key": "Manual key"
   },
   "message": {
     "action-confirmation": "Type {confirmation} in the box below to confirm.",
@@ -443,6 +456,20 @@
     "replay-min-duration-description": "Only show replays at or above this duration.",
     "viewed-page": "Viewed page",
     "upgrade-required": "This feature requires a {plan} plan subscription.",
-    "visitor-log": "Visitor from <b>{country}</b> using <b>{browser}</b> on <b>{os}</b> <b>{device}</b>"
+    "visitor-log": "Visitor from <b>{country}</b> using <b>{browser}</b> on <b>{os}</b> <b>{device}</b>",
+    "two-factor-prompt": "Enter your authenticator code or a recovery code.",
+    "two-factor-setup-intro": "Two-factor authentication adds an extra verification step to keep your account secure.",
+    "two-factor-setup-step-scan": "Step 1 of 2: Add your authenticator app.",
+    "two-factor-setup-step-verify": "Step 2 of 2: Enter the 6-digit code from your authenticator app.",
+    "two-factor-setup-step-recovery": "Final step: Save your recovery codes before you continue.",
+    "two-factor-setup-prompt": "Scan this QR code with your authenticator app or enter the manual key.",
+    "two-factor-recovery-warning": "Save these recovery codes now. Each code can only be used once.",
+    "two-factor-recovery-copy-failed": "Could not copy recovery codes. Please copy them manually.",
+    "invalid-two-factor-code": "Invalid authentication or recovery code.",
+    "expired-two-factor-challenge": "Your login verification has expired. Please login again.",
+    "two-factor-required": "Two-factor authentication is required.",
+    "invalid-two-factor-setup": "Two-factor setup is invalid or expired. Please start again.",
+    "two-factor-already-enabled": "Two-factor authentication is already enabled.",
+    "two-factor-not-enabled": "Two-factor authentication is not enabled."
   }
 }
