@@ -67,6 +67,14 @@ select:is(:-webkit-autofill, :autofill):focus {
   min-height: 100px;
 }
 
+/* @umami/react-zen's Switch thumb uses bg-surface-base, which equals the
+   dark theme's page background, making the unchecked (off) state nearly
+   invisible. Give the thumb a fixed mid-tone so it's visible in both
+   states and both themes. */
+.react-aria-Switch > div > div {
+  background-color: var(--gray-400);
+}
+
 /* rrweb-player overrides */
 .rr-controller__btns {
   gap: 8px;
